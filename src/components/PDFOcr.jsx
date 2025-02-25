@@ -11,12 +11,23 @@ const PDFOcr = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type === 'application/pdf') {
-      setFile(selectedFile);
-      setResult(null);
-    } else {
-      alert('Please select a valid PDF file');
+    
+    if (!selectedFile) {
+      return; // User canceled file selection
     }
+    
+    if (selectedFile.type !== 'application/pdf') {
+      setFile(null);
+      setStatusMessage(`Error: "${selectedFile.name}" is not a PDF file. Please select a valid PDF document.`);
+      // Clear the file input
+      e.target.value = '';
+      return;
+    }
+    
+    // Valid PDF file
+    setFile(selectedFile);
+    setResult(null);
+    setStatusMessage(''); // Clear any previous error messages
   };
 
   const handleSubmit = async (e) => {
@@ -73,7 +84,11 @@ const PDFOcr = () => {
             onChange={handleFileChange} 
             disabled={processing}
           />
-          {file && <p>Selected file: {file.name}</p>}
+          {file && <p className="file-selected">Selected file: {file.name}</p>}
+          
+          {!file && statusMessage && !processing && (
+            <p className="error-message">{statusMessage}</p>
+          )}
         </div>
         
         <button 
